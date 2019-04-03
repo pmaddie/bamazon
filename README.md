@@ -13,10 +13,10 @@ The app is also made to give the custoemr a total for the item(s) they want and 
 --------------------------------------------------------------------------------------
 
 You will start the app by:
-'git clone https://github.com/pmaddie/bamazon
-cd bamazon
-npm i
-node bamazon.js'
+`git clone https://github.com/pmaddie/bamazon`
+`cd bamazon`
+`npm i`
+`node bamazon.js`
 
 --------------------------------------------------------------------------------------
 

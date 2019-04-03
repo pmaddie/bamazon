@@ -110,8 +110,7 @@ function confirmInput(value) {
 						console.log("\n---------------------------------------------------------------------\n");
 
 
-            //end connection
-            connection.end();
+         
 
               })
 
@@ -121,7 +120,8 @@ function confirmInput(value) {
 					console.log("\n---------------------------------------------------------------------\n");
                   displayInventory();
               }
-
+   //end connection
+            connection.end();
             }
           })
           })
