@@ -116,7 +116,7 @@ inquirer
               })
 
               } else {
-                console.log('Sorry, there is not enough product in stock, your order can not be placed as is.');
+                console.log('Sorry, insufficient quantity!');
 					console.log('Please modify your order.');
 					console.log("\n---------------------------------------------------------------------\n");
                   displayInventory();
