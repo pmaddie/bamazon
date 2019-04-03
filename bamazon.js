@@ -78,12 +78,12 @@ inquirer
         console.log('Customer has selected \n item_id = ' + input.item_id + ' \n quantity = ' + input.stock_quantity);
 
         var item = input.item_id;
-        var quantity = input.stock_quantity;
+        var quantity = input.quantity;
 
         //query DB to check that the selected item id exists and is in stock
-        var queryChk = 'SELECT * FROM products WHERE ?';
+        var query = 'SELECT * FROM products WHERE ?';
 
-        connection.query(queryChk, {item_id: item}, function(err, data) {
+        connection.query(query, {item_id: item}, function(err, data) {
           if (err) throw err;
 
           if (data.length === 0) {
@@ -92,12 +92,79 @@ inquirer
         
           } else {
             var productData = data[0];
-          }
-          }
-        }
-      }
 
+            //if the amount needed is in stock
+            if (quantity <= productData.stock_quantity) {
+              console.log('Congratulations, the product you requested is in stock! Placing order!');
+
+              //UPDATE 
+              var updateQuery = 'UPDATE products SET stock_quantity = ' + (productData.stock_quantity - quantity) + ' WHERE item_id = ' + item;
+              console.log('updateQuery = ' + updateQuery);
+
+              connection.query(updateQuery, function(err, data) {
+                if (err) throw err;
+
+
+						console.log('Your oder has been placed! Your total is $' + productData.price * quantity);
+						console.log('Thank you for shopping!');
+						console.log("\n---------------------------------------------------------------------\n");
+
+
+            //end connection
+            connection.end();
+
+              })
+
+              } else {
+                console.log('Sorry, there is not enough product in stock, your order can not be placed as is.');
+					console.log('Please modify your order.');
+					console.log("\n---------------------------------------------------------------------\n");
+                  displayInventory();
+              }
+
+            }
+          })
+          })
         }
-      }
-    ])
-  }
+    // displayInventory will retrieve the current inventory from the database and output it to the console
+function displayInventory() {
+
+
+	// Construct the db query string
+	query = 'SELECT * FROM products';
+
+	// Make the db query
+	connection.query(query, function(err, data) {
+		if (err) throw err;
+
+		console.log('Existing Inventory: ');
+		console.log('...................\n');
+
+		var Display = '';
+		for (var i = 0; i < data.length; i++) {
+			Display = '';
+			Display += 'Item ID: ' + data[i].item_id + '  //  ';
+			Display += 'Product Name: ' + data[i].product_name + '  //  ';
+			Display += 'Department: ' + data[i].department_name + '  //  ';
+			Display += 'Price: $' + data[i].price + '\n';
+
+			console.log(Display);
+		}
+
+	  	console.log("---------------------------------------------------------------------\n");
+
+	  	//Prompt the user for item/quantity they would like to purchase
+	  	promptUserPurchase();
+	})
+}
+
+// runBamazon will execute the main application logic
+function runBamazon() {
+	// console.log('___ENTER runBamazon___');
+
+	// Display the available inventory
+	displayInventory();
+}
+
+// Run the application logic
+runBamazon();
