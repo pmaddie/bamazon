@@ -1,5 +1,6 @@
 var mysql = require("mysql");
-
+var inquirer = require("inquirer");
+var nodemon = require("nodemon");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -9,103 +10,94 @@ var connection = mysql.createConnection({
   user: "root",
   // Your password
   password: "root",
-  database: "bamazonDB"
+  database: "bamazon"
 });
 
-connection.connect(function(err) {
-  if (err) throw err;
+connection.connect(function() {
+  // if (err) throw err;
   console.log("connected as id " + connection.threadId + "\n");
-  createProduct();
 });
 
+//confirmInput to make sure the customer is uses only positive numbers for their requests
+function confirmInput(value) {
+  // determines whether the passed value is an integer.
+  var integer = Number.isInteger(parseFloat(value));
+  //function returns the sign of a number, indicating whether the number is positive, negative or zero.
+  var sign = Math.sign(value);
 
-function start() {
-    connection.query("SELECT * FROM products", function (err, res) {
-        if (err) throw err;
+  if (integer && (sign === 1)) {
+    return true;
+  }
+  else {
+    return 'Please enter a whole non-zero number.';
+  }
+}
+
+
+
+//and then start your inquirer prompts like this 
+
+inquirer
+  .prompt([
+    {
+      type: 'input',
+      message: 'What is the ID of the item you wish to purchase?',
+      name: 'item_id',
+      validate: confirmInput,
+      filter: Number
+    },
+    {
+      type: 'input',
+      message: 'How many would you like to purchase',
+      name: 'stock_quantity',
+      validate: confirmInput,
+      filter: Number
+    }
+  ]).then(function (input) {
+    console.log('Customer has selected: \n    item_id = ' + input.item_id + '\n    quantity = ' + input.quantity);
+  });
+
+  //promptUserPurchase will promt user for the item and quantity they would like to purchase
+  function promptUserPurchase() {
+
+    //promt customer to select an item
+    inquirer.prompt([
+      {
+        type: 'input',
+        name: 'item_id',
+        message: 'Please enter the Item ID that you would like to purchase.',
+        validate: confirmInput,
+        filter: Number},
+        {
+          type: 'input',
+          name: 'stock_quantity',
+          message: 'How many would you like to purchase?',
+          filter: Number
+        }
+      ]).then(function(input) {
+        console.log('Customer has selected \n item_id = ' + input.item_id + ' \n quantity = ' + input.stock_quantity);
+
+        var item = input.item_id;
+        var quantity = input.stock_quantity;
+
+        //query DB to check that the selected item id exists and is in stock
+        var queryChk = 'SELECT * FROM products WHERE ?';
+
+        connection.query(queryChk, {item_id: item}, function(err, data) {
+          if (err) throw err;
+
+          if (data.length === 0) {
+            console.log('ERROR: Invalid Item ID. Please select a valid Item ID.');
+        displayInventory();
         
-        //console log your response here and put it into a table or
-        //just console log the results in a neat and clean way.
-        
-        //and then start your inquirer prompts like this 
-        
-        inquirer
-          .prompt([
-            {
-              type: 'input',
-              message: 'What is the ID of the item you wish to purchase?',
-              name: 'first',
-              validate: function (value) {
-                if (isNaN(value) === false) {
-                  return true;
-                }
-                return false;
-              }}])
-// function createProduct() {
-//   console.log("Inserting a new product...\n");
-//   var query = connection.query(
-//     "INSERT INTO products SET ?",
-//     {
-//         product_name: "item 1",
-//         department_name: "department 1",
-//         price: 1.00,
-//         stock_quantity: 25
-//     },
+          } else {
+            var productData = data[0];
+          }
+          }
+        }
+      }
 
-//     function(err, res) {
-//       console.log(res.affectedRows + " product inserted!\n");
-//       // Call updateProduct AFTER the INSERT completes
-//       updateProduct();
-//     }
-//   );
-
-//   // logs the actual query being run
-//   console.log(query.sql);
-// }
-
-// function updateProduct() {
-//   console.log("Updating all product quantities...\n");
-//   var query = connection.query(
-//     "UPDATE products SET ? WHERE ?",
-//     [
-//       {
-//         quantity: 100
-//       },
-//       {
-//         product: "item 1"
-//       }
-//     ],
-//     function(err, res) {
-//       console.log(res.affectedRows + " products updated!\n");
-//       // Call deleteProduct AFTER the UPDATE completes
-//       deleteProduct();
-//     }
-//   );
-
-//   // logs the actual query being run
-//   console.log(query.sql);
-// }
-
-// function deleteProduct() {
-//   console.log("Deleting all item 4...\n");
-//   connection.query(
-//     "DELETE FROM products WHERE ?",
-//     {
-//       product: "item4"
-//     },
-//     function(err, res) {
-//       console.log(res.affectedRows + " products deleted!\n");
-//       // Call readProducts AFTER the DELETE completes
-//       readProducts();
-//     }
-//   );
-// }
-
-// function readProducts() {
-//   console.log("Selecting all products...\n");
-//   connection.query("SELECT * FROM products", function(err, res) {
-//     if (err) throw err;
-//     // Log all results of the SELECT statement
-//     console.log(res);
-//     connection.end();
-//   });
-// }
+        }
+      }
+    ])
+  }

@@ -1,6 +1,6 @@
-drop database if exists bamazonDB;
+drop database if exists bamazon;
 
-create database bamazonDB;
+create database bamazon;
 
 use bamazonDB;
 
