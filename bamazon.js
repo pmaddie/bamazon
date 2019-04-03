@@ -37,25 +37,25 @@ function confirmInput(value) {
 
 //and then start your inquirer prompts like this 
 
-inquirer
-  .prompt([
-    {
-      type: 'input',
-      message: 'What is the ID of the item you wish to purchase?',
-      name: 'item_id',
-      validate: confirmInput,
-      filter: Number
-    },
-    {
-      type: 'input',
-      message: 'How many would you like to purchase',
-      name: 'stock_quantity',
-      validate: confirmInput,
-      filter: Number
-    }
-  ]).then(function (input) {
-    console.log('Customer has selected: \n    item_id = ' + input.item_id + '\n    quantity = ' + input.quantity);
-  });
+// inquirer
+//   .prompt([
+//     {
+//       type: 'input',
+//       message: 'What is the ID of the item you wish to purchase?',
+//       name: 'item_id',
+//       validate: confirmInput,
+//       filter: Number
+//     },
+//     {
+//       type: 'input',
+//       message: 'How many would you like to purchase',
+//       name: 'stock_quantity',
+//       validate: confirmInput,
+//       filter: Number
+//     }
+//   ]).then(function (input) {
+//     console.log('Customer has selected: \n    item_id = ' + input.item_id + '\n    quantity = ' + input.quantity);
+//   });
 
   //promptUserPurchase will promt user for the item and quantity they would like to purchase
   function promptUserPurchase() {
